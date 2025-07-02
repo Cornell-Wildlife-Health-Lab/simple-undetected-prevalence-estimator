@@ -98,11 +98,11 @@ params=readr::read_csv(params_filepath)
 # R script will not run if it does not exist.
 
     # Make sure the names are consistent. 
-    colnames(params)=c("DemographyFileName","Species","SeasonYear","Alpha","Sensitivity","CreateVisualization","VizualizationTitle","VizualizationTag","DemographyType","DemographySpecies")
+    colnames(params)=c("alpha","sensitivity")
 
     # Obtain the parameters from the params file.
-    confidence=1-as.numeric(params$Alpha) # Confidence level.
-    Sens=as.numeric(params$Sensitivity) # Sensitivity of the diagnostic test.
+    confidence=1-as.numeric(params$alpha) # Confidence level.
+    Sens=as.numeric(params$sensitivity) # Sensitivity of the diagnostic test.
 
 # Read in the (Required) SubAdmin file. --------- 
 subadmin_filepath=file.path("","data","sub_administrative_area.csv")

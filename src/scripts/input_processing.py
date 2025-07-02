@@ -208,14 +208,6 @@ except FileNotFoundError:
   model_log_html("Parameters (params.json) file not found.")
   sys.exit(1)
 
-# Convert season_year list to a string
-if 'season_year' in params:
-  params['season_year'] = ", ".join(params['season_year'])
-
-# Convert species list to a string
-if 'species' in params:
-  params['species'] = ", ".join(params['species'])
-  
 # Get provider admin area for logging
 provider_admin_area = params['_provider']['_administrative_area']['administrative_area']
 model_log_html(f'Provider area: {provider_admin_area}')
@@ -385,7 +377,7 @@ with open(pathlib.Path(base_path / "sample.csv"), 'w', newline='') as f:
 
 # Write revised parameters to a CSV file
 with open(pathlib.Path(base_path / "params.csv"), 'w', newline='') as f:
-  field_names = params.keys()
+  field_names = ["alpha", "sensitivity"]
   writer = csv.DictWriter(
     f, 
     quoting=csv.QUOTE_NONNUMERIC,

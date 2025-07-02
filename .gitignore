@@ -3,8 +3,8 @@
 
 # local R virtual environment
 /renv/
-renv.lock
-.Rprofile
+/renv.lock
+/.Rprofile
 
 # development environment
 /.vscode/
