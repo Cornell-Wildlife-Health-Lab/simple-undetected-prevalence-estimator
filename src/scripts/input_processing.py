@@ -352,11 +352,11 @@ for sample_record in sample_data:
   # Get sub-administrative area for each sample
   # If the sample has no sub-administrative area or if the sub-administrative
   # area has no id, then return None.
-  if '_sub_administrative_area' in sample_record:
-    if '_id' in sample_record['_sub_administrative_area']:
-      sample_record["sub_administrative_area_id"] = sample_record['_sub_administrative_area']['_id']
-    else:sample_record["sub_administrative_area_id"] = None
-  else:sample_record["sub_administrative_area_id"] = None
+  sub_area = sample_record.get('_sub_administrative_area')
+  if isinstance(sub_area, dict):
+      sample_record["sub_administrative_area_id"] = sub_area.get('_id')
+  else:
+      sample_record["sub_administrative_area_id"] = None
   
   # Rename _id field
   if '_id' in sample_record:
