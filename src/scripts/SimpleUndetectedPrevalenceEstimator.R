@@ -25,9 +25,8 @@
 #_______________________________________________________________________________
 
 # Load packages. ----------
-library(VGAM)
-library(tidyverse)
-
+suppressPackageStartupMessages(library(VGAM))
+suppressPackageStartupMessages(library(tidyverse))
 # Reusable Functions
 add_item_to_json_array=function(file_path, new_item) {
     # This is a bespoke function that adds a string representing a JavaScript
@@ -92,7 +91,7 @@ write(line,file=model_log_filepath,append=TRUE)
 
 # Read in the (Required) Parameters file. -----------
 params_filepath=file.path("","data","params.csv")
-params=readr::read_csv(params_filepath)
+params=readr::read_csv(params_filepath,show_col_types = FALSE)
 # Note: The params.csv has to exist b/c Python generated it and b/c model has 
 # to create it. Therefore,this error handling is in the python code and this 
 # R script will not run if it does not exist.
@@ -106,7 +105,7 @@ params=readr::read_csv(params_filepath)
 
 # Read in the (Required) SubAdmin file. --------- 
 subadmin_filepath=file.path("","data","sub_administrative_area.csv")
-subadmin=readr::read_csv(subadmin_filepath) 
+subadmin=readr::read_csv(subadmin_filepath,show_col_types = FALSE) 
 # Note: The sub_administrative_area.csv has to exist b/c Python generated it 
 # and b/c model has to create it. Therefore, this error handling is in the 
 # python code and this R script will not run if it does not exist. 
@@ -116,7 +115,7 @@ subadmin=readr::read_csv(subadmin_filepath)
 
 # Read in (Required) Samples file. -----------
 sample_filepath=file.path("","data","sample.csv")
-sample=readr::read_csv(sample_filepath) 
+sample=readr::read_csv(sample_filepath,show_col_types = FALSE) 
 # Note: The samples.csv has to exist b/c Python generated it 
 # and b/c model has to create it. Therefore, this error handling is in the 
 # python code and this R script will not run if it does not exist.
@@ -126,7 +125,7 @@ sample=readr::read_csv(sample_filepath)
 
 # Read in (Required) Demography file. ----------
 demography_filepath=file.path("","data","demography.csv")
-demography=readr::read_csv(demography_filepath) 
+demography=readr::read_csv(demography_filepath,show_col_types = FALSE) 
 # Note: The demography.csv has to exist b/c Python generated it 
 # and b/c model has to create it. Therefore, this error handling is in the 
 # python code and this R script will not run if it does not exist.
@@ -260,6 +259,19 @@ NonDetect_Dim=as.numeric(nrow(NonDetect))}
 
 # Append the output data to the standardized SubAdmin frame. 
 DataForMath=merge(NonDetect,demography,by = c("SubAdminID"),all.x=TRUE)
+  
+  # check that there is at least 1 record with complete cases, 
+  # i.e. must have at least one set of values with n and N > 0
+  DataForMath_chk = DataForMath %>% mutate_at(vars(n,N),~ifelse(. == 0, NA, .))
+  if ( !any(complete.cases(DataForMath_chk[, c("n", "N")])) ){
+    # Write a note.
+    line="<p>There are no eligible sub-administrative units that have both sample data and demography data.</p>" 
+    write(line,file=model_log_filepath,append=TRUE)
+    line="<p>Return to the CWD Data Warehouse and add data to one or both of the collections.</p>" 
+    write(line,file=model_log_filepath,append=TRUE)
+    # Quit the session.
+    quit(status=70)
+  }
 
 # Obtain the vectors of data used in the math. 
 N=as.numeric(DataForMath$N) # Population size.
