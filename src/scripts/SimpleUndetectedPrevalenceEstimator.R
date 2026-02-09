@@ -308,16 +308,31 @@ upperFreqSe=function(N,n,CONFIDENCE,SENSITIVITY){
     p2=sum(dhyper(y,d,N-d,n)*(1-SENSITIVITY)^y)}
   d/N}
 
-# Initialize empty vectors to hold outputs.
-bayes=c()
-freq=c()
-freq.se=c()
+# Initialize zero vectors to hold outputs.
+bayes=rep(NA,length(n))
+freq=rep(NA,length(n))
+freq.se=rep(NA,length(n))
 
-# Calculate Bayesian upper bounds for all N and n combinations.
+# Add the extra checks:
+# N cannot be zero
+# N-n cannot be zero or negative. 
+
+# Calculate Bayesian upper bounds for all N and n combinations that satisfy the checks.
 for(k in 1:length(n)){
+  
+  # Check 1. N cannot be zero. 
+  if (N[k]>0){
+    
+  # Check 2. N-n must be greater than 0. 
+  if (N[k]-n[k]>0){
+    
   bayes[k]=upperBayes(N[k],n[k],CONFIDENCE[k])
   freq[k]=upperFreq(N[k],n[k],CONFIDENCE[k])
   freq.se[k]=upperFreqSe(N[k],n[k],CONFIDENCE[k],SENSITIVITY[k])
+  
+  } # End check 2. 
+  } # End check 1. 
+  
 } # End for k. 
 
 # Collapse into a single output matrix. 
